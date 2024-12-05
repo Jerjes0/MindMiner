@@ -8,6 +8,8 @@ class MindMiner:
         self.paper_graph = {}
         self.failed_papers = []
         self.failed_reference_papers = []
+        self.text_corpus = {}
+        self.tfidf_dict = {}
 
     def fetch_paper(self,title):
         try:
@@ -57,5 +59,31 @@ class MindMiner:
                     self.failed_reference_papers.append(reference)
                     continue
                 
-    def build_corpus(self, reference):
+    def build_single_corpus(self, reference):
+        references = [reference]
+        for inner_reference in self.paper_graph[reference].keys():
+                try:
+                    for _inner_reference in self.paper_graph[reference][inner_reference].keys():
+                        references.append(_inner_reference)
+                except:
+                    continue
+        references = list(set(references))
+
+        corpus = [self.abstract_dict[_reference] for _reference in references if _reference in self.abstract_dict.keys()]
         
+        self.text_corpus[reference] = corpus
+    
+    def build_corpus(self):
+        for reference in self.paper_graph.keys():
+            self.build_single_corpus(reference)
+    
+    def get_single_tfidf(self, reference):
+        tfidf = train_tfidf(self.text_corpus[reference])
+        self.tfidf_dict[reference] = tfidf
+        # return tfidf
+    
+    def get_tfidf(self):
+        for reference in self.paper_graph.keys():
+            tfidf = train_tfidf(self.text_corpus[reference])
+        self.tfidf_dict[reference] = tfidf
+

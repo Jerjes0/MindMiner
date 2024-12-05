@@ -221,3 +221,13 @@ def save_paper_as_pretty_xml(xml_content, file_path):
 def list_to_dict(input_list):
     return {item: None for item in input_list}
 
+def train_tfidf(documents):
+    documents = [str(doc) for doc in documents]
+
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+    feature_names = tfidf_vectorizer.get_feature_names_out()
+    dense_tfidf = tfidf_matrix.toarray()
+    tfidf_df = pd.DataFrame(dense_tfidf, columns=feature_names, index=[f"Document {i+1}" for i in range(len(documents))])
+    return tfidf_df
+
